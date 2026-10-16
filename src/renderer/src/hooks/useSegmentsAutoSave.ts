@@ -9,14 +9,16 @@ import { getSuffixedOutPath } from '../util';
 import type { StateSegment } from '../types';
 import { errorToast } from '../swal';
 import i18n from '../i18n';
+import type { TextOverlay } from '../textOverlays';
 
 
-export default ({ autoSaveProjectFile, storeProjectInWorkingDir, filePath, customOutDir, cutSegments }: {
+export default ({ autoSaveProjectFile, storeProjectInWorkingDir, filePath, customOutDir, cutSegments, textOverlays }: {
   autoSaveProjectFile: boolean,
   storeProjectInWorkingDir: boolean,
   filePath: string | undefined,
   customOutDir: string | undefined,
   cutSegments: StateSegment[],
+  textOverlays: TextOverlay[],
 }) => {
   const projectSuffix = 'proj.llc';
   // New LLC format can be stored along with input file or in working dir (customOutDir)
@@ -26,8 +28,8 @@ export default ({ autoSaveProjectFile, storeProjectInWorkingDir, filePath, custo
 
   const currentSaveOperation = useMemo(() => {
     if (!projectFileSavePath) return undefined;
-    return { cutSegments, projectFileSavePath, filePath };
-  }, [cutSegments, filePath, projectFileSavePath]);
+    return { cutSegments, textOverlays, projectFileSavePath, filePath };
+  }, [cutSegments, textOverlays, filePath, projectFileSavePath]);
 
   // NOTE: Could lose a save if user closes too fast, but not a big issue I think
   const [debouncedSaveOperation] = useDebounce(currentSaveOperation, isDev ? 2000 : 500);
@@ -41,20 +43,20 @@ export default ({ autoSaveProjectFile, storeProjectInWorkingDir, filePath, custo
           || !debouncedSaveOperation
           || debouncedSaveOperation.filePath == null
           // Don't create llc file if no segments yet
-          || debouncedSaveOperation.cutSegments.length === 0
+          || (debouncedSaveOperation.cutSegments.length === 0 && debouncedSaveOperation.textOverlays.length === 0)
           // or if initial segment (and not deselected): https://github.com/mifi/lossless-cut/issues/2745#issuecomment-3979480707
-          || (debouncedSaveOperation.cutSegments[0]?.initial && debouncedSaveOperation.cutSegments[0].selected)
+          || (debouncedSaveOperation.cutSegments[0]?.initial && debouncedSaveOperation.cutSegments[0].selected && debouncedSaveOperation.textOverlays.length === 0 && !(lastSaveOperation.current?.projectFileSavePath === debouncedSaveOperation.projectFileSavePath && lastSaveOperation.current.textOverlays.length > 0))
         ) {
           return;
         }
 
-        if (lastSaveOperation.current && lastSaveOperation.current.projectFileSavePath === debouncedSaveOperation.projectFileSavePath && isEqual(mapSaveableSegments(lastSaveOperation.current.cutSegments), mapSaveableSegments(debouncedSaveOperation.cutSegments))) {
+        if (lastSaveOperation.current && lastSaveOperation.current.projectFileSavePath === debouncedSaveOperation.projectFileSavePath && isEqual(lastSaveOperation.current.textOverlays, debouncedSaveOperation.textOverlays) && isEqual(mapSaveableSegments(lastSaveOperation.current.cutSegments), mapSaveableSegments(debouncedSaveOperation.cutSegments))) {
           console.log('Segments unchanged, skipping save');
           return;
         }
 
         console.log('Saving project file', debouncedSaveOperation.projectFileSavePath, debouncedSaveOperation.cutSegments);
-        await saveLlcProject({ savePath: debouncedSaveOperation.projectFileSavePath, mediaFilePath: debouncedSaveOperation.filePath, cutSegments: debouncedSaveOperation.cutSegments });
+        await saveLlcProject({ savePath: debouncedSaveOperation.projectFileSavePath, mediaFilePath: debouncedSaveOperation.filePath, cutSegments: debouncedSaveOperation.cutSegments, textOverlays: debouncedSaveOperation.textOverlays });
         lastSaveOperation.current = debouncedSaveOperation;
       } catch (err) {
         errorToast(i18n.t('Unable to save project file'));

@@ -21,6 +21,7 @@ import Button from './components/Button';
 import type { UseSegments } from './hooks/useSegments';
 import { keyMap } from './hooks/useTimelineScroll';
 import { calculateTimelinePercent as calculateTimelinePercent2, calculateTimelinePos } from './util';
+import type { TextOverlay } from './textOverlays';
 
 
 type CalculateTimelinePercent = (time: number) => string | undefined;
@@ -86,6 +87,8 @@ const CommandedTime = memo(({ commandedTimePercent }: { commandedTimePercent: st
 const timelineHeight = 36;
 
 function Timeline({
+  textOverlays,
+  onTextClick,
   fileDurationNonZero,
   playerTime,
   commandedTime,
@@ -118,6 +121,8 @@ function Timeline({
   setCutTime,
   setHoveringTime,
 } : {
+  textOverlays: TextOverlay[],
+  onTextClick: (time: number) => void,
   fileDurationNonZero: number,
   startTimeOffset: number,
   playerTime: number | undefined,
@@ -388,6 +393,22 @@ function Timeline({
         onScroll={onTimelineScroll}
         ref={timelineScrollerRef}
       >
+        {textOverlays.length > 0 && (
+          <div aria-label={t('Explanatory text')} style={{ height: 24, width: `${zoom * 100}%`, position: 'relative', background: 'var(--gray-3)' }}>
+            {textOverlays.map((overlay, index) => (
+              <button
+                type="button"
+                key={overlay.id}
+                title={`${overlay.text} (${formatTimecode({ seconds: overlay.start })} – ${formatTimecode({ seconds: overlay.end })})`}
+                onMouseDown={(event) => event.stopPropagation()}
+                onClick={() => onTextClick(overlay.start)}
+                style={{ position: 'absolute', left: `${(overlay.start / fileDurationNonZero) * 100}%`, width: `${((Math.min(overlay.end, fileDurationNonZero) - overlay.start) / fileDurationNonZero) * 100}%`, top: (index % 2) * 3, height: 20, border: '1px solid var(--violet-8)', borderRadius: 4, background: 'var(--violet-4)', color: 'var(--violet-12)', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis', textAlign: 'left', fontSize: 11, cursor: 'pointer' }}
+              >
+                T · {overlay.text}
+              </button>
+            ))}
+          </div>
+        )}
         {waveformEnabled && shouldShowWaveform && (waveforms.length > 0 || overviewWaveform != null) && (
           <Waveforms
             calculateTimelinePercent={calculateTimelinePercent}

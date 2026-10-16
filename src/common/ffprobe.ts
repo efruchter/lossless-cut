@@ -357,6 +357,7 @@ export interface FFprobeStream {
    * The video stream width (also available for images) (not present if codec_type is not "video")
    */
   width?: number,
+  side_data_list?: { rotation?: number }[],
 
   /**
    * The stream height (also available for images) (not present if codec_type is not "video")

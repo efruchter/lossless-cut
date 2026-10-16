@@ -25,7 +25,7 @@ Please read the documentation before creating an issue. Thank you 🙏
 
 ## Commonly requested features
 
-- **Q:** Can LosslessCut **crop, resize, stretch, mirror/flip, reverse, overlay text/images, watermark, blur, redact, reduce quality/re-encode, create GIF, slideshow, burn subtitles, color grading, fade/transition between video clips, fade/combine/mix/merge audio tracks, mute audio channels or change audio volume**?
+- **Q:** Can LosslessCut **crop, resize, stretch, mirror/flip, reverse, overlay images, watermark, blur, redact, create GIF, slideshow, burn subtitles, color grading, fade/transition between video clips, fade/combine/mix/merge audio tracks, mute audio channels or change audio volume**?
   - **A:** No, these are all lossy operations (meaning you *have* to re-encode the file), but in the future I may start to implement such features. [See #372](https://github.com/mifi/lossless-cut/issues/372). Related: [#643](https://github.com/mifi/lossless-cut/issues/643).
 - **Q:** When will you implement feature X?
   - **A:** I have limited time and I have a lot of projects to work on, so I cannot promise any timeline. I will usually prioritize the issues with the most likes, [see here for a list of the most popular issues](https://github.com/mifi/lossless-cut/issues/691).
@@ -54,6 +54,12 @@ If you have a problem with the app or with a file, please see the [🤔 Troubles
 
 ## Usage: Typical workflow
 
+For cuts between keyframes, choose **Frame accurate (re-encode)** from the **Cut precision** selector in the toolbar or export options. This decodes and re-encodes video and audio at your selected cut points. Precision is limited to the frames present in the source. Encoding takes longer and may reduce quality. The original keyframe, normal stream-copy and experimental Smart Cut modes remain available.
+
+To explain a moment, click **Text**, then **Add text at playhead**. Enter the text and its start and end times. Drag the text on the preview to position it, and drag its corner handle or use the size slider to resize it. You can also choose a color and dark background. Click **Apply text** to save the card. Text appears on its own timeline lane and is saved in LLC projects. During export, it is burned into the video and keeps its timing across cuts and merged segments.
+
+Frame-accurate and text exports support MP4, MOV, MKV, WebM, MPEG-TS and AVI, with one selected video track and output playback rate set to 1×. Text exports automatically use frame-accurate cuts.
+
 - **Drag and drop** a video file into player or use <kbd>⌘</kbd>/<kbd>CTRL</kbd> + <kbd>O</kbd>.
 - <kbd>SPACE</kbd> to play/pause or <kbd>←</kbd> <kbd>→</kbd> <kbd>,</kbd> <kbd>.</kbd> or mouse/trackpad wheel to seek back/forth.
 - Set the start/end times of the current segment by first moving the timeline cursor and then pressing <kbd>I</kbd> to set start time and <kbd>O</kbd> to set end time. You can also press hold <kbd>SHIFT</kbd> while dragging a segment with the mouse to move or resize it
@@ -62,7 +68,7 @@ If you have a problem with the app or with a file, please see the [🤔 Troubles
 - <kbd>BACKSPACE</kbd> to remove cutpoint/segment.
 - If you create segments without an end time, it is a [marker](#markers) instead of a segment.
   - Note that when exporting, all segments you create will be **preserved** and exported as new files. You can change this behavior with the **Yin Yang** symbol ☯️, in which case the behaviour is inverted and LosslessCut will instead **skip** all selected segments and export the parts **between** segments as files.
-  - Also note that start times will not be accurate, see [Known issues](troubleshooting.md).
+  - By default, start times snap to keyframes. Choose **Frame accurate (re-encode)** to cut at the selected frames.
 - *(optional)* <kbd>+</kbd> to add another segment at the current cursor time. Then select the segment end time with <kbd>O</kbd>.
 - *(optional)* If you want to merge all the selected segments into one file after cutting, change the `Export mode` from `Separate files` to `Merge cuts`.
 - *(optional)* If you want to export to a certain output folder, press the `Working dir unset` button (defaults to same folder as source file).

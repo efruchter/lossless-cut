@@ -61,6 +61,8 @@ export default function useUserSettingsRoot() {
   useEffect(() => safeSetConfig({ enableCustomOutDir }), [enableCustomOutDir]);
   const [keyframeCut, setKeyframeCut] = useState(safeGetConfigInitial('keyframeCut'));
   useEffect(() => safeSetConfig({ keyframeCut }), [keyframeCut]);
+  const [enableFrameAccurateCut, setEnableFrameAccurateCut] = useState(safeGetConfigInitial('enableFrameAccurateCut'));
+  useEffect(() => safeSetConfig({ enableFrameAccurateCut }), [enableFrameAccurateCut]);
   const [preserveMetadata, setPreserveMetadata] = useState(safeGetConfigInitial('preserveMetadata'));
   useEffect(() => safeSetConfig({ preserveMetadata }), [preserveMetadata]);
   const [preserveMetadataOnMerge, setPreserveMetadataOnMerge] = useState(safeGetConfigInitial('preserveMetadataOnMerge'));
@@ -291,6 +293,7 @@ export default function useUserSettingsRoot() {
     segmentsToChaptersOnly,
     keyBindings,
     enableSmartCut,
+    enableFrameAccurateCut,
     customFfPath,
     storeProjectInWorkingDir,
     enableOverwriteOutput,
@@ -373,6 +376,7 @@ export default function useUserSettingsRoot() {
     setKeyBindings,
     resetKeyBindings,
     setEnableSmartCut,
+    setEnableFrameAccurateCut,
     setCustomFfPath,
     setStoreProjectInWorkingDir,
     setEnableOverwriteOutput,

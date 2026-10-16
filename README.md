@@ -34,6 +34,8 @@ The main feature is lossless trimming and cutting of video and audio files, whic
 
 - Lossless cutting of most video and audio formats
 - [Smart cut](https://github.com/mifi/lossless-cut/issues/126) (experimental)
+- Frame-accurate cuts between keyframes by re-encoding video and audio
+- Timed explanatory text with draggable positioning, resizing, live preview and burned-in export
 - Losslessly cut out parts of video/audio (for cutting away commercials etc.)
 - Losslessly rearrange the order of video/audio segments
 - Lossless merge/concatenation of arbitrary files (with identical codecs parameters, e.g. from the same camera)

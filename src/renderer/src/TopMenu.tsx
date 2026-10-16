@@ -1,7 +1,7 @@
 import type { CSSProperties, ReactNode } from 'react';
 import { memo, useCallback, useEffect, useRef } from 'react';
 import { IoIosSettings } from 'react-icons/io';
-import { FaFilter, FaList, FaLock, FaMoon, FaSun, FaUnlock } from 'react-icons/fa';
+import { FaFilter, FaList, FaLock, FaMoon, FaSun, FaUnlock, FaFont } from 'react-icons/fa';
 import { useTranslation } from 'react-i18next';
 import Button from './components/Button';
 
@@ -13,6 +13,7 @@ import useUserSettings from './hooks/useUserSettings';
 import useActionTitle from './hooks/useActionTitle';
 import styles from './TopMenu.module.css';
 import OutDirSelector from './components/OutDirSelector';
+import CutModeSelect from './components/CutModeSelect';
 
 
 const { stat } = window.require('node:fs/promises');
@@ -35,6 +36,10 @@ function TopMenu({
   selectedSegments,
   isCustomFormatSelected,
   toggleDarkMode,
+  onTextClick,
+  textCount,
+  hasVideo,
+  textEditorShown,
 }: {
   filePath: string | undefined,
   fileFormat: string | undefined,
@@ -49,6 +54,10 @@ function TopMenu({
   selectedSegments: unknown[],
   isCustomFormatSelected: boolean,
   toggleDarkMode: () => void,
+  onTextClick: () => void,
+  textCount: number,
+  hasVideo: boolean,
+  textEditorShown: boolean,
 }) {
   const { t } = useTranslation();
   const { customOutDir, setCustomOutDir, simpleMode, outFormatLocked, setOutFormatLocked, darkMode } = useUserSettings();
@@ -119,6 +128,17 @@ function TopMenu({
       )}
 
       <div style={{ flexGrow: 1 }} />
+
+      {filePath && hasVideo && (
+        <CutModeSelect hasTextOverlays={textCount > 0} />
+      )}
+
+      {filePath && hasVideo && (
+        <Button onClick={onTextClick} aria-pressed={textEditorShown} title={t('Add explanatory text to the video')}>
+          <FaFont style={{ fontSize: '.8em', marginRight: '.4em' }} />
+          {t('Text')}{textCount > 0 && ` (${textCount})`}
+        </Button>
+      )}
 
       <OutDirSelector>
         <Button

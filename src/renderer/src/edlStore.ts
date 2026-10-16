@@ -10,6 +10,7 @@ import type { EdlExportType, EdlFileType, EdlImportType, GetFrameCount, LlcProje
 import { llcProjectV1Schema, llcProjectV2Schema } from './types';
 import { mapSaveableSegments } from './segments';
 import isDev from './isDev';
+import type { TextOverlay } from './textOverlays';
 
 const { readFile, writeFile } = window.require('node:fs/promises');
 const cueParser = window.require('cue-parser');
@@ -82,15 +83,17 @@ export async function saveSrt(path: string, cutSegments: SegmentBase[]) {
   await writeFile(path, formatSrt(cutSegments));
 }
 
-export async function saveLlcProject({ savePath, mediaFilePath, cutSegments }: {
+export async function saveLlcProject({ savePath, mediaFilePath, cutSegments, textOverlays = [] }: {
   savePath: string,
   mediaFilePath: string,
   cutSegments: StateSegment[],
+  textOverlays?: TextOverlay[],
 }) {
   const projectData: LlcProject = {
     version: 2,
     mediaFileName: basename(mediaFilePath),
     cutSegments: mapSaveableSegments(cutSegments),
+    ...(textOverlays.length > 0 && { textOverlays }),
   };
   await writeFile(savePath, JSON5.stringify(projectData, null, 2));
 }
@@ -156,7 +159,7 @@ export async function readEdlFile({ type, path, fps }: {
   throw new Error('Invalid EDL type');
 }
 
-export async function askForEdlImport({ type, fps, fileDuration }: { type: EdlImportType, fps?: number | undefined, fileDuration?: number | undefined }) {
+export async function askForEdlImport({ type, fps, fileDuration, onTextOverlays }: { type: EdlImportType, fps?: number | undefined, fileDuration?: number | undefined, onTextOverlays?: (overlays: TextOverlay[]) => void }) {
   if (type === 'youtube') return askForYouTubeInput({ fileDuration });
 
   let filters;
@@ -178,15 +181,21 @@ export async function askForEdlImport({ type, fps, fileDuration }: { type: EdlIm
   });
   const [firstFilePath] = filePaths;
   if (canceled || firstFilePath == null) return [];
+  if (type === 'llc') {
+    const project = await loadLlcProject(firstFilePath);
+    onTextOverlays?.(project.textOverlays ?? []);
+    return project.cutSegments;
+  }
   return readEdlFile({ type, path: firstFilePath, fps });
 }
 
-export async function exportEdlFile({ type, cutSegments, customOutDir, filePath, getFrameCount }: {
+export async function exportEdlFile({ type, cutSegments, customOutDir, filePath, getFrameCount, textOverlays }: {
   type: EdlExportType,
   cutSegments: StateSegment[],
   customOutDir?: string | undefined,
   filePath?: string | undefined,
   getFrameCount: GetFrameCount,
+  textOverlays?: TextOverlay[],
 }) {
   invariant(filePath != null);
 
@@ -223,6 +232,6 @@ export async function exportEdlFile({ type, cutSegments, customOutDir, filePath,
   else if (type === 'tsv-human') await saveTsv(savePath, cutSegments);
   else if (type === 'csv-human') await saveCsvHuman(savePath, cutSegments);
   else if (type === 'csv-frames') await saveCsvFrames({ path: savePath, cutSegments, getFrameCount });
-  else if (type === 'llc') await saveLlcProject({ savePath, mediaFilePath: filePath, cutSegments });
+  else if (type === 'llc') await saveLlcProject({ savePath, mediaFilePath: filePath, cutSegments, ...(textOverlays != null && { textOverlays }) });
   else if (type === 'srt') await saveSrt(savePath, cutSegments);
 }

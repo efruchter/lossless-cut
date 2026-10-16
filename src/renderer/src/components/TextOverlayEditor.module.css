@@ -1,0 +1,102 @@
+.panel {
+  width: 340px;
+  max-width: 45vw;
+  flex-shrink: 0;
+  overflow: auto;
+  box-sizing: border-box;
+  padding: 16px;
+  border-left: 1px solid var(--gray-6);
+  background: var(--gray-2);
+  color: var(--gray-12);
+  font-size: 13px;
+}
+
+.heading, .options, .times, .card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.heading {
+  justify-content: space-between;
+  font-size: 16px;
+}
+
+.help {
+  color: var(--gray-11);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 16px 0;
+}
+
+.form label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.form textarea {
+  resize: vertical;
+  font: inherit;
+  color: var(--gray-12);
+  background: var(--gray-3);
+  border: 1px solid var(--gray-7);
+  border-radius: 6px;
+  padding: 8px;
+}
+
+.times > label {
+  flex: 1;
+}
+
+.times input {
+  min-width: 0;
+  padding: 6px;
+}
+
+.options label {
+  flex-direction: row;
+  align-items: center;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 16px 0;
+}
+
+.card {
+  padding: 8px;
+  border: 1px solid var(--gray-6);
+  border-radius: 6px;
+}
+
+.cardButton {
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+}
+
+.cardButton span, .cardButton strong {
+  display: block;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.cardButton span {
+  color: var(--gray-11);
+  font-size: 11px;
+  margin-bottom: 4px;
+}
+
+.error {
+  color: var(--red-11);
+}

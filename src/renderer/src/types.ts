@@ -2,6 +2,7 @@ import type { MenuItem, MenuItemConstructorOptions } from 'electron';
 import { z } from 'zod';
 import type { FFprobeChapter, FFprobeFormat, FFprobeStream } from '../../common/ffprobe';
 import type { FileStream } from './ffmpeg';
+import { textOverlaySchema } from './textOverlays';
 
 
 export interface ChromiumHTMLVideoElement extends HTMLVideoElement {
@@ -38,6 +39,7 @@ export const llcProjectV1Schema = z.object({
 export const llcProjectV2Schema = z.object({
   version: z.literal(2),
   mediaFileName: z.string().optional(),
+  textOverlays: textOverlaySchema.array().optional(),
   cutSegments: z.object({
     start: z.number(),
     end: z.number().optional(),
